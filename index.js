@@ -5,18 +5,15 @@ const appTypes = require('./appTypes.js')
 
 const PORT = process.env.PORT || 8080
 
-const distFolder = "public"
-const htmlType = "text/html"
-
 http.createServer((req, res) => {
     // Build the file path
-    let filePath = path.join(__dirname, distFolder, req.url === '/' ? 'index.html' : req.url)
+    let filePath = path.join(__dirname, "public", req.url === "/" ? "index.html" : req.url);
 
     // Get the file extension
     let extname = path.extname(filePath)
 
     // By default, we're looking for text/html files
-    let contentType = htmlType
+    let contentType = "text/html"
 
     // But if the extension is something else, the contentType is assigned accordingly based on data in appTypes...
     for (let prop in appTypes) {
@@ -25,15 +22,21 @@ http.createServer((req, res) => {
         }
     }
 
-    //Read the file
+    // Check if the contentType is text/html with no specified html file ext
+    if (contentType == "text/html" && extname == '') {
+        filePath += '.html'
+    }
 
+    console.log(filePath);
+
+    //Read the file
     fs.readFile(filePath, (err, content) => {
         if (err) {
             //Account for Page Not Found
             if (err.code === "ENOENT") {
                 fs.readFile(
-                    path.join(__dirname, distFolder, "404.html"), (err, content) => {
-                        res.writeHead(404, {"Content-Type": htmlType})
+                    path.join(__dirname, "public", "404.html"), (err, content) => {
+                        res.writeHead(404, {"Content-Type": "text/html"})
                         res.end(content, "utf8")
                     }) 
             } else {

@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 const http = require('http');
-const appTypes = require('./appTypes.js')
 
 const PORT = process.env.PORT || 8080
 
@@ -16,18 +15,28 @@ http.createServer((req, res) => {
     let contentType = "text/html"
 
     // But if the extension is something else, the contentType is assigned accordingly based on data in appTypes...
-    for (let prop in appTypes) {
-        if (extname === prop) {
-            contentType = appTypes[prop]
-        }
-    }
+    switch (extname) {
+        case ".js":
+          contentType = "text/javascript";
+          break;
+        case ".css":
+          contentType = "text/css";
+          break;
+        case ".json":
+          contentType = "application/json";
+          break;
+        case ".jpg":
+          contentType = "image/jpg";
+          break;
+        case ".svg":
+          contentType = "image/svg";
+          break;
+      }
 
     // Check if the contentType is text/html with no specified html file ext
     if (contentType == "text/html" && extname == '') {
         filePath += '.html'
     }
-
-    console.log(filePath);
 
     //Read the file
     fs.readFile(filePath, (err, content) => {
